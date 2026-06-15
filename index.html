@@ -67,6 +67,8 @@
   header.scrolled{border-bottom-color:var(--line);}
   .nav{display:flex;align-items:center;justify-content:space-between;height:72px;}
   .brand{font-family:"Fraunces",serif;font-weight:500;font-size:1.5rem;letter-spacing:-.02em;display:flex;align-items:center;}
+  .brand img.logo{height:38px;width:auto;display:block;}
+  .logo-foot{height:46px;width:auto;display:block;}
   .brand .o{
     display:inline-block;width:.62em;height:.62em;border-radius:50%;
     margin:0 .01em;transform:translateY(.04em);
@@ -277,7 +279,7 @@
 
 <header id="top">
   <div class="wrap nav">
-    <a class="brand" href="#top" aria-label="Nudispot home">Nudisp<span class="o" aria-hidden="true"></span>t</a>
+    <a class="brand" href="#top" aria-label="Nudispot home"><img src="logo.png" alt="Nudispot" class="logo" /></a>
     <nav class="nav-links" id="navlinks">
       <a href="#how">How it works</a>
       <a href="#specs">What's inside</a>
@@ -453,7 +455,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <div class="foot-brand">Nudispot</div>
+        <div class="foot-brand"><img src="logo.png" alt="Nudispot" class="logo-foot" /></div>
         <p style="max-width:30ch;margin:12px 0 0;">Hydrocolloid spot patches for bare skin that's allowed to have a bad day.</p>
       </div>
       <div class="foot-cols">
@@ -478,6 +480,23 @@
     <p class="legal mono">© <span id="yr"></span> Nudispot LLC · Wyoming, USA — Not intended to treat, cure, or prevent disease. For external use on intact skin.</p>
   </div>
 </footer>
+
+<!-- Supabase client (loads the official library from CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ===== CONFIGURE THESE TWO VALUES (Supabase → Project Settings → API) =====
+  const SUPABASE_URL = "https://lefryqsrintggbcgqvxa.supabase.co";      // e.g. https://abcdxyz.supabase.co
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZnJ5cXNyaW50Z2diY2dxdnhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MzE1MjcsImV4cCI6MjA5NzEwNzUyN30.03jt63jilmojZB5MpX19eiHjtTwS_CdCsWV2D9ESmls";
+  // =========================================================================
+  let sb = null;
+  const sbConfigured = SUPABASE_URL.startsWith("http") && !SUPABASE_ANON_KEY.startsWith("PASTE");
+  if (sbConfigured && window.supabase) {
+    try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+    catch (e) { console.error("Supabase init failed:", e); }
+  } else {
+    console.warn("Supabase not configured yet — signups won't be saved. Add your URL and anon key.");
+  }
+</script>
 
 <script>
   // year
@@ -515,14 +534,30 @@
     });
   });
 
-  // join form (in-memory only)
+  // join form → saves to Supabase
   const form = document.getElementById('joinForm');
   const card = document.getElementById('joinCard');
-  form.addEventListener('submit', (e) => {
+  const submitBtn = form.querySelector('button[type="submit"]');
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email');
-    if (!email.value || !/.+@.+\..+/.test(email.value)) { email.focus(); email.style.outline = '2px solid var(--berry)'; return; }
-    card.classList.add('done');
+    const emailInput = document.getElementById('email');
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email || !/.+@.+\..+/.test(email)) { emailInput.focus(); emailInput.style.outline = '2px solid var(--berry)'; return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Joining…';
+
+    const { error } = await sb.from('subscribers').insert({ email });
+
+    if (error && error.code !== '23505') {
+      // 23505 = duplicate email; we treat that as success below
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join the list';
+      emailInput.style.outline = '2px solid var(--berry)';
+      console.error('Signup error:', error);
+      return;
+    }
+    card.classList.add('done'); // shows the "You're on the list" message
   });
 
   // before / after slider
