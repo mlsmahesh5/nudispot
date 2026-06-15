@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nudispot — Hydrocolloid Spot Patches</title>
+<meta name="description" content="Nudispot hydrocolloid patches draw out a breakout overnight and disappear on your face. Go bare — we'll get the spot." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --petal:#FBF1EC;      /* warm blush canvas */
+    --sand:#F3E4D9;       /* panel */
+    --sand-deep:#EAD3C4;
+    --ink:#3B2A26;        /* deep cocoa text */
+    --ink-soft:#7A655D;   /* muted */
+    --berry:#D4416A;      /* the one accent / CTA */
+    --berry-deep:#B12F55;
+    --skin-1:#F8CDB1;
+    --skin-2:#EDA791;
+    --skin-3:#CE8A82;
+    --line:rgba(59,42,38,.14);
+    --maxw:1180px;
+    --r:18px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--petal);
+    color:var(--ink);
+    font-family:"DM Sans",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif;font-weight:400;letter-spacing:-.01em;line-height:1.04;margin:0;}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+  .mono{font-family:"DM Mono",monospace;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;}
+
+  /* ---------- the recurring patch dot ---------- */
+  .dot{
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 34% 30%, rgba(255,255,255,.85), rgba(255,255,255,0) 42%),
+      radial-gradient(circle at 65% 72%, rgba(212,65,106,.10), rgba(212,65,106,0) 60%),
+      rgba(255,250,247,.45);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:inset 0 1px 3px rgba(255,255,255,.7), 0 2px 8px rgba(59,42,38,.10);
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,241,236,.78);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s, background .3s;
+  }
+  header.scrolled{border-bottom-color:var(--line);}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .brand{font-family:"Fraunces",serif;font-weight:500;font-size:1.5rem;letter-spacing:-.02em;display:flex;align-items:center;}
+  .brand .o{
+    display:inline-block;width:.62em;height:.62em;border-radius:50%;
+    margin:0 .01em;transform:translateY(.04em);
+    background:
+      radial-gradient(circle at 35% 30%, #fff, rgba(255,255,255,0) 45%),
+      radial-gradient(circle at 65% 70%, var(--skin-2), var(--skin-3));
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.8), 0 1px 4px rgba(59,42,38,.18);
+  }
+  .nav-links{display:flex;gap:30px;align-items:center;}
+  .nav-links a{font-size:.95rem;color:var(--ink-soft);transition:color .2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5em;
+    font-family:"DM Sans",sans-serif;font-weight:600;font-size:.95rem;
+    padding:.7em 1.25em;border-radius:999px;border:1px solid transparent;
+    cursor:pointer;transition:transform .18s var(--ease), background .2s, box-shadow .2s;
+  }
+  .btn-primary{background:var(--berry);color:#fff;box-shadow:0 6px 18px rgba(212,65,106,.28);}
+  .btn-primary:hover{background:var(--berry-deep);transform:translateY(-2px);box-shadow:0 10px 24px rgba(212,65,106,.34);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--ink);transform:translateY(-2px);}
+  .nav .btn{padding:.6em 1.1em;}
+  .menu-toggle{display:none;background:none;border:0;font-size:1.4rem;cursor:pointer;color:var(--ink);}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 84px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
+  .eyebrow{color:var(--berry);margin-bottom:22px;display:inline-flex;align-items:center;gap:.7em;}
+  .eyebrow .pip{width:7px;height:7px;border-radius:50%;background:var(--berry);}
+  .hero h1{font-size:clamp(2.9rem,6.4vw,5.2rem);}
+  .hero h1 em{font-style:italic;font-weight:300;}
+  .hero p.lede{font-size:1.18rem;color:var(--ink-soft);max-width:30ch;margin:24px 0 34px;}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .soon{display:inline-flex;align-items:center;gap:.6em;color:var(--ink);padding:.7em 1.1em;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.5);}
+  .soon-pip{width:8px;height:8px;border-radius:50%;background:var(--berry);box-shadow:0 0 0 0 rgba(212,65,106,.5);animation:pulse 2s var(--ease) infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,65,106,.5);}70%{box-shadow:0 0 0 8px rgba(212,65,106,0);}100%{box-shadow:0 0 0 0 rgba(212,65,106,0);}}
+  .trust{margin-top:30px;display:flex;gap:26px;flex-wrap:wrap;color:var(--ink-soft);}
+  .trust span{display:flex;align-items:center;gap:.5em;font-size:.9rem;}
+  .trust .pip{width:6px;height:6px;border-radius:50%;background:var(--skin-3);}
+
+  /* before/after skin panel */
+  .ba{
+    position:relative;aspect-ratio:1/1.06;border-radius:26px;overflow:hidden;
+    box-shadow:0 30px 70px -30px rgba(59,42,38,.5), inset 0 0 0 1px rgba(255,255,255,.35);
+    user-select:none;touch-action:none;
+    background:
+      radial-gradient(120% 120% at 30% 18%, var(--skin-1), var(--skin-2) 52%, var(--skin-3) 100%);
+  }
+  .ba-layer{position:absolute;inset:0;}
+  .skin-tex{position:absolute;inset:0;opacity:.5;mix-blend-mode:soft-light;
+    background-image:radial-gradient(rgba(255,255,255,.5) .6px, transparent .7px);
+    background-size:7px 7px;}
+  .blemish{
+    position:absolute;left:50%;top:46%;width:54px;height:54px;border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 50% 45%, rgba(196,52,72,.9), rgba(196,52,72,.35) 45%, rgba(196,52,72,0) 72%);
+    filter:blur(.5px);
+  }
+  .blemish.healed{
+    background:radial-gradient(circle at 50% 45%, rgba(196,52,72,.32), rgba(196,52,72,.12) 50%, rgba(196,52,72,0) 75%);
+  }
+  .patch{
+    position:absolute;left:50%;top:46%;width:104px;height:104px;border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:
+      radial-gradient(circle at 36% 30%, rgba(255,255,255,.7), rgba(255,255,255,0) 46%),
+      radial-gradient(circle at 50% 50%, rgba(255,253,250,.34), rgba(255,253,250,.12));
+    border:1px solid rgba(255,255,255,.55);
+    box-shadow:inset 0 2px 6px rgba(255,255,255,.6), inset 0 -6px 14px rgba(206,138,130,.35), 0 6px 16px rgba(59,42,38,.18);
+    backdrop-filter:blur(.5px);
+  }
+  .ba-clip{position:absolute;inset:0;clip-path:inset(0 50% 0 0);will-change:clip-path;}
+  .ba-handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:rgba(255,255,255,.85);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(59,42,38,.1);}
+  .ba-knob{
+    position:absolute;top:50%;left:50%;width:46px;height:46px;border-radius:50%;
+    transform:translate(-50%,-50%);background:#fff;cursor:ew-resize;
+    box-shadow:0 4px 14px rgba(59,42,38,.28);display:grid;place-items:center;color:var(--ink);
+    font-size:1rem;
+  }
+  .ba-label{position:absolute;bottom:16px;padding:.3em .7em;border-radius:999px;background:rgba(59,42,38,.55);color:#fff;backdrop-filter:blur(4px);}
+  .ba-label.l{left:16px;}
+  .ba-label.r{right:16px;}
+
+  /* ---------- generic section ---------- */
+  section{padding:96px 0;}
+  .sec-head{max-width:54ch;margin-bottom:54px;}
+  .sec-head .eyebrow{margin-bottom:18px;}
+  .sec-head h2{font-size:clamp(2rem,4.2vw,3.2rem);}
+  .sec-head p{color:var(--ink-soft);font-size:1.1rem;margin:18px 0 0;max-width:46ch;}
+
+  /* steps */
+  #how{background:var(--sand);}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .step{background:var(--petal);border-radius:var(--r);padding:32px 28px 36px;position:relative;border:1px solid var(--line);}
+  .step .num{color:var(--berry);margin-bottom:20px;}
+  .step .icon{width:58px;height:58px;margin-bottom:20px;}
+  .step h3{font-size:1.5rem;margin-bottom:10px;}
+  .step p{color:var(--ink-soft);font-size:1rem;margin:0;}
+
+  /* specs / lab */
+  .lab{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:center;}
+  .sheet{
+    background:var(--sand);border-radius:24px;padding:40px;border:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(4,1fr);gap:22px;place-items:center;
+    box-shadow:0 24px 60px -34px rgba(59,42,38,.5);
+  }
+  .sheet .dot{}
+  .sheet .s1{width:34px;height:34px;}
+  .sheet .s2{width:46px;height:46px;}
+  .sheet .s3{width:58px;height:58px;}
+  .specs{list-style:none;margin:0;padding:0;}
+  .specs li{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);}
+  .specs li:last-child{border-bottom:0;}
+  .specs .k{color:var(--ink-soft);}
+  .specs .v{font-weight:600;text-align:right;}
+
+  /* manifesto */
+  #bare{background:var(--ink);color:var(--petal);}
+  #bare .eyebrow{color:var(--skin-1);}
+  #bare .eyebrow .pip{background:var(--skin-1);}
+  .manifesto{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(1.9rem,4.6vw,3.4rem);line-height:1.18;max-width:20ch;}
+  .manifesto b{font-weight:500;font-style:italic;color:#fff;}
+  #bare p.sub{color:rgba(251,241,236,.7);max-width:44ch;margin-top:28px;font-size:1.1rem;}
+
+  /* reviews */
+  .reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .review{background:var(--petal);border:1px solid var(--line);border-radius:var(--r);padding:28px;}
+  .rate{display:flex;gap:5px;margin-bottom:16px;}
+  .rate .dot{width:11px;height:11px;background:
+      radial-gradient(circle at 35% 30%, #fff, rgba(255,255,255,0) 45%),
+      var(--berry);border-color:transparent;box-shadow:none;}
+  .review p{margin:0 0 18px;font-size:1.02rem;}
+  .review .who{color:var(--ink-soft);font-size:.9rem;display:flex;align-items:center;gap:.6em;}
+  .review .who .v{color:var(--berry);font-weight:600;}
+
+  /* faq */
+  #faq{background:var(--sand);}
+  .faq-list{max-width:760px;margin:0 auto;}
+  .faq{border-bottom:1px solid var(--line);}
+  .faq button{
+    width:100%;background:none;border:0;cursor:pointer;text-align:left;
+    display:flex;justify-content:space-between;align-items:center;gap:24px;
+    padding:26px 4px;font-family:"Fraunces",serif;font-size:1.3rem;color:var(--ink);
+  }
+  .faq .ans{max-height:0;overflow:hidden;transition:max-height .4s var(--ease);}
+  .faq .ans p{color:var(--ink-soft);margin:0 0 26px;padding-right:40px;}
+  .faq .pm{flex:none;width:26px;height:26px;position:relative;}
+  .faq .pm::before,.faq .pm::after{content:"";position:absolute;background:var(--berry);border-radius:2px;transition:transform .3s var(--ease);}
+  .faq .pm::before{left:50%;top:4px;bottom:4px;width:2px;transform:translateX(-50%);}
+  .faq .pm::after{top:50%;left:4px;right:4px;height:2px;transform:translateY(-50%);}
+  .faq.open .pm::before{transform:translateX(-50%) scaleY(0);}
+
+  /* join band */
+  .join{background:
+      radial-gradient(120% 160% at 85% 20%, var(--skin-1), var(--skin-2) 45%, var(--skin-3) 100%);
+    border-radius:28px;padding:64px 56px;color:var(--ink);position:relative;overflow:hidden;}
+  .join .deco{position:absolute;border-radius:50%;background:rgba(255,255,255,.22);}
+  .join h2{font-size:clamp(2rem,4.4vw,3rem);max-width:16ch;}
+  .join p{margin:16px 0 28px;max-width:42ch;}
+  .join form{display:flex;gap:12px;max-width:480px;flex-wrap:wrap;}
+  .join input{
+    flex:1;min-width:220px;padding:.95em 1.2em;border-radius:999px;border:1px solid rgba(59,42,38,.25);
+    background:rgba(255,255,255,.7);font-family:inherit;font-size:1rem;color:var(--ink);
+  }
+  .join input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+  .join .note{font-size:.82rem;color:rgba(59,42,38,.6);margin-top:14px;}
+  .join .ok{display:none;font-weight:600;}
+  .join.done form{display:none;}
+  .join.done .ok{display:block;}
+
+  /* footer */
+  footer{padding:64px 0 48px;color:var(--ink-soft);font-size:.92rem;}
+  .foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px;border-top:1px solid var(--line);padding-top:40px;}
+  .foot-brand{font-family:"Fraunces",serif;font-size:1.4rem;color:var(--ink);}
+  .foot-cols{display:flex;gap:64px;flex-wrap:wrap;}
+  .foot-cols h4{font-family:"DM Mono",monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:0 0 14px;font-weight:500;}
+  .foot-cols a{display:block;margin-bottom:9px;color:var(--ink-soft);}
+  .foot-cols a:hover{color:var(--ink);}
+  .legal{margin-top:40px;font-size:.8rem;color:var(--ink-soft);}
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease), transform .7s var(--ease);}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* responsive */
+  @media(max-width:920px){
+    .hero-grid{grid-template-columns:1fr;gap:40px;}
+    .ba{max-width:440px;}
+    .lab{grid-template-columns:1fr;gap:36px;}
+    .steps,.reviews{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .menu-toggle{display:block;}
+    .nav-links.open{display:flex;position:absolute;top:72px;left:0;right:0;flex-direction:column;background:var(--petal);padding:20px 28px 28px;gap:18px;border-bottom:1px solid var(--line);}
+    .join{padding:48px 30px;}
+  }
+  @media(max-width:520px){
+    body{font-size:16px;}
+    .wrap{padding:0 20px;}
+    section{padding:72px 0;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important;scroll-behavior:auto;}
+    .reveal{opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Nudispot home">Nudisp<span class="o" aria-hidden="true"></span>t</a>
+    <nav class="nav-links" id="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#specs">What's inside</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#join" id="navShop">Join the list</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="reveal in">
+        <span class="eyebrow mono"><span class="pip"></span> Hydrocolloid spot patches</span>
+        <h1>Go bare.<br><em>We'll get the spot.</em></h1>
+        <p class="lede">Translucent patches that quietly draw out a breakout overnight — then practically vanish on your face come morning.</p>
+        <div class="hero-cta">
+          <span class="soon mono"><span class="soon-pip"></span> Launching soon</span>
+          <a class="btn btn-primary" href="#join">Join the launch list</a>
+        </div>
+        <div class="trust mono">
+          <span><span class="pip"></span> Vegan</span>
+          <span><span class="pip"></span> Cruelty-free</span>
+          <span><span class="pip"></span> Fragrance-free</span>
+        </div>
+      </div>
+
+      <!-- before / after signature -->
+      <div class="reveal in">
+        <div class="ba" id="ba" role="group" aria-label="Drag to compare bare skin and patched skin">
+          <div class="ba-layer">
+            <div class="skin-tex"></div>
+            <div class="blemish healed"></div>
+            <div class="patch"></div>
+            <span class="ba-label r mono">patched</span>
+          </div>
+          <div class="ba-clip" id="baClip">
+            <div class="ba-layer" style="background:radial-gradient(120% 120% at 30% 18%, var(--skin-1), var(--skin-2) 52%, var(--skin-3) 100%);">
+              <div class="skin-tex"></div>
+              <div class="blemish"></div>
+              <span class="ba-label l mono">bare</span>
+            </div>
+          </div>
+          <div class="ba-handle" id="baHandle">
+            <div class="ba-knob" id="baKnob" tabindex="0" role="slider" aria-label="Compare slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">⇆</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow mono"><span class="pip"></span> The overnight shift</span>
+        <h2>Three steps. Then go to sleep.</h2>
+        <p>Hydrocolloid does the unglamorous work for you — no picking, no popping, no fuss.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="num mono">01</div>
+          <svg class="icon" viewBox="0 0 60 60" fill="none" aria-hidden="true"><circle cx="30" cy="30" r="20" fill="#F8CDB1"/><circle cx="30" cy="30" r="10" fill="none" stroke="#D4416A" stroke-width="2.4"/></svg>
+          <h3>Stick it on</h3>
+          <p>Clean, dry skin. Press a patch over the spot — pick the size that just covers it.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num mono">02</div>
+          <svg class="icon" viewBox="0 0 60 60" fill="none" aria-hidden="true"><circle cx="30" cy="30" r="20" fill="#EDA791"/><path d="M30 18v24M18 30h24" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+          <h3>It gets to work</h3>
+          <p>The film absorbs fluid and gunk from the surface, flattens the bump, and keeps your fingers off.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num mono">03</div>
+          <svg class="icon" viewBox="0 0 60 60" fill="none" aria-hidden="true"><circle cx="30" cy="30" r="20" fill="#CE8A82"/><path d="M21 31l6 6 12-13" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Peel in the morning</h3>
+          <p>When it turns cloudy white, it's done its job. Lift it off to a calmer, flatter spot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECS / WHAT'S INSIDE -->
+  <section id="specs">
+    <div class="wrap lab">
+      <div class="reveal">
+        <div class="sheet" aria-label="A sheet of patches in three sizes">
+          <div class="dot s1"></div><div class="dot s2"></div><div class="dot s3"></div><div class="dot s2"></div>
+          <div class="dot s2"></div><div class="dot s3"></div><div class="dot s1"></div><div class="dot s2"></div>
+          <div class="dot s3"></div><div class="dot s1"></div><div class="dot s2"></div><div class="dot s3"></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow mono"><span class="pip"></span> What's inside</span>
+        <h2 style="font-size:clamp(1.9rem,4vw,2.8rem);margin-bottom:12px;">Medical-grade film.<br>Nothing it doesn't need.</h2>
+        <ul class="specs mono">
+          <li><span class="k">Material</span><span class="v">Medical-grade hydrocolloid</span></li>
+          <li><span class="k">Best on</span><span class="v">Surface whiteheads &amp; popped spots</span></li>
+          <li><span class="k">Finish</span><span class="v">Matte translucent — daylight wearable</span></li>
+          <li><span class="k">Free from</span><span class="v">Fragrance · dyes · drying acids</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section id="bare">
+    <div class="wrap reveal">
+      <span class="eyebrow mono"><span class="pip"></span> Why "nudi"</span>
+      <p class="manifesto">A spot isn't a flaw to hide. It's just <b>skin, mid-conversation</b> with itself. We make the patch that helps — and then gets out of the way.</p>
+      <p class="sub">No before-and-after shame, no airbrush. Wear it to the grocery store. Wear it on a call. Your bare face was never the problem.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head reveal" style="text-align:center;margin-left:auto;margin-right:auto;">
+        <span class="eyebrow mono" style="justify-content:center;"><span class="pip"></span> Honest answers</span>
+        <h2>The stuff worth knowing.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq reveal">
+          <button aria-expanded="false">Will people actually see it?<span class="pm"></span></button>
+          <div class="ans"><p>The matte translucent finish blends into most skin tones, and the 7mm is close to invisible from a step back. It's built to be worn out, not just at home.</p></div>
+        </div>
+        <div class="faq reveal">
+          <button aria-expanded="false">Does it work on deep, cystic acne?<span class="pm"></span></button>
+          <div class="ans"><p>Honestly, it's best on surface stuff — whiteheads and spots that have come to a head. Hydrocolloid pulls fluid from the surface, so a deep cystic bump under the skin won't get the same result. We'd rather tell you than oversell it.</p></div>
+        </div>
+        <div class="faq reveal">
+          <button aria-expanded="false">I have sensitive skin. Is it okay?<span class="pm"></span></button>
+          <div class="ans"><p>It's fragrance-free, dye-free, and uses a gentle adhesive with no drying acids. As with anything new, patch-test on your arm first if you react easily.</p></div>
+        </div>
+        <div class="faq reveal">
+          <button aria-expanded="false">How long do I leave it on?<span class="pm"></span></button>
+          <div class="ans"><p>Six to eight hours, or overnight. When the center turns cloudy white, it's absorbed what it can — time for a fresh one or bare skin.</p></div>
+        </div>
+        <div class="faq reveal">
+          <button aria-expanded="false">Can I put makeup over it?<span class="pm"></span></button>
+          <div class="ans"><p>You can dab a little on top, though it works best worn bare so it stays sealed. Most people save the daytime patch for no-makeup days and use the rest overnight.</p></div>
+        </div>
+        <div class="faq reveal">
+          <button aria-expanded="false">Where can I buy?<span class="pm"></span></button>
+          <div class="ans"><p>We're still in our testing stage right now, so nothing's for sale just yet. Drop your email below and you'll be the first to know the moment the first sheets are ready.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section id="join">
+    <div class="wrap">
+      <div class="join reveal" id="joinCard">
+        <div class="deco" style="width:240px;height:240px;top:-80px;right:-60px;"></div>
+        <div class="deco" style="width:120px;height:120px;bottom:-40px;right:140px;"></div>
+        <h2>Be first when we launch.</h2>
+        <p>We're putting the finishing touches on the first batch. Join the list for launch day, early access, and the occasional skin pep talk. No spam, ever.</p>
+        <form id="joinForm" novalidate>
+          <input type="email" id="email" placeholder="you@email.com" aria-label="Email address" required />
+          <button class="btn btn-primary" type="submit">Join the list</button>
+        </form>
+        <p class="ok">You're on the list. We'll be in touch before the next sheet ships. ✨</p>
+        <p class="note">By joining you agree to receive Nudispot emails. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="shop">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">Nudispot</div>
+        <p style="max-width:30ch;margin:12px 0 0;">Hydrocolloid spot patches for bare skin that's allowed to have a bad day.</p>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <h4>Shop</h4>
+          <a href="#join">Launching soon</a>
+          <a href="#join">Notify me at launch</a>
+        </div>
+        <div>
+          <h4>Learn</h4>
+          <a href="#how">How it works</a>
+          <a href="#specs">What's inside</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div>
+          <h4>Brand</h4>
+          <a href="#bare">Why "nudi"</a>
+          <a href="#how">How it works</a>
+        </div>
+      </div>
+    </div>
+    <p class="legal mono">© <span id="yr"></span> Nudispot LLC · Wyoming, USA — Not intended to treat, cure, or prevent disease. For external use on intact skin.</p>
+  </div>
+</footer>
+
+<script>
+  // year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // sticky header border
+  const header = document.querySelector('header');
+  addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 8), {passive:true});
+
+  // mobile menu
+  const toggle = document.getElementById('menuToggle');
+  const links = document.getElementById('navlinks');
+  toggle.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    links.classList.remove('open'); toggle.setAttribute('aria-expanded', false);
+  }));
+
+  // reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  }, {threshold:.14});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // FAQ accordion
+  document.querySelectorAll('.faq button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const faq = btn.parentElement;
+      const ans = faq.querySelector('.ans');
+      const open = faq.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+      ans.style.maxHeight = open ? ans.scrollHeight + 'px' : 0;
+    });
+  });
+
+  // join form (in-memory only)
+  const form = document.getElementById('joinForm');
+  const card = document.getElementById('joinCard');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email');
+    if (!email.value || !/.+@.+\..+/.test(email.value)) { email.focus(); email.style.outline = '2px solid var(--berry)'; return; }
+    card.classList.add('done');
+  });
+
+  // before / after slider
+  (function(){
+    const ba = document.getElementById('ba');
+    const clip = document.getElementById('baClip');
+    const handle = document.getElementById('baHandle');
+    const knob = document.getElementById('baKnob');
+    let pct = 50, dragging = false;
+    function set(p){
+      pct = Math.max(0, Math.min(100, p));
+      clip.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
+      handle.style.left = pct + '%';
+      knob.setAttribute('aria-valuenow', Math.round(pct));
+    }
+    function fromEvent(clientX){
+      const r = ba.getBoundingClientRect();
+      set(((clientX - r.left) / r.width) * 100);
+    }
+    function down(e){ dragging = true; ba.setPointerCapture?.(e.pointerId); fromEvent(e.clientX); }
+    function move(e){ if(dragging) fromEvent(e.clientX); }
+    function up(){ dragging = false; }
+    ba.addEventListener('pointerdown', down);
+    addEventListener('pointermove', move);
+    addEventListener('pointerup', up);
+    knob.addEventListener('keydown', (e) => {
+      if(e.key === 'ArrowLeft'){ set(pct - 4); e.preventDefault(); }
+      if(e.key === 'ArrowRight'){ set(pct + 4); e.preventDefault(); }
+    });
+    set(50);
+  })();
+</script>
+</body>
+</html>
